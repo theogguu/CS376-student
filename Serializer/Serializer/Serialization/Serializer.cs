@@ -187,32 +187,37 @@ namespace Assets.Serialization
         /// <param name="o">Object to serialize</param>
         private void WriteObject(object o)
         {
+
             switch (o)
             {
                 case null:
-                    throw new NotImplementedException("Fill me in");
+                    Write("null");
                     break;
-
+                    
                 case int i:
-                    throw new NotImplementedException("Fill me in");
+                    Write(i);
                     break;
 
                 case float f:
-                    throw new NotImplementedException("Fill me in");
+                    Write(f);
                     break;
 
                 // Not: don't worry about handling strings that contain quote marks
                 case string s:
-                    throw new NotImplementedException("Fill me in");
+                    Write($"\"{s}\"");
                     break;
 
                 case bool b:
-                    throw new NotImplementedException("Fill me in");
+                    Write(b);
                     break;
 
                 case IList list:
-                    throw new NotImplementedException("Fill me in");
+                    foreach (object item in list)
+                    {
+                        WriteObject(item);
+                    }
                     break;
+
 
                 default:
                     if (o.GetType().IsValueType)
@@ -231,7 +236,23 @@ namespace Assets.Serialization
         /// <param name="o">Object to serialize</param>
         private void WriteComplexObject(object o)
         {
-            throw new NotImplementedException("Fill me in");
+            var (id, isNew) = GetId(o);
+            Write($"#{id}");
+            if (isNew)
+            {
+                WriteBracketedExpression(
+                    "{",
+                    () =>
+                    {
+                        WriteField("type", o.GetType().Name, true);
+                        foreach (var (str, obj) in Utilities.SerializedFields(o))
+                        {
+                            WriteField(str, obj, false);
+                        }
+                    },    
+                    "}"
+                    );
+            }
         }
     }
 }
