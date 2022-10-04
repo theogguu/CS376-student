@@ -282,7 +282,7 @@ namespace Assets.Serialization
         private object ReadComplexObject(int enclosingId)
         {
             GetChar();  // Swallow the #
-            var id = (int)ReadNumber(enclosingId);
+            int id = (int)ReadNumber(enclosingId);
             SkipWhitespace();
 
             // You've got the id # of the object.  Are we done now?
@@ -295,7 +295,7 @@ namespace Assets.Serialization
             SkipWhitespace();
             if (End)
                 throw new EndOfStreamException($"Stream ended after reference to unknown ID {id}");
-            var c = GetChar();
+            char c = GetChar();
             if (c != '{')
    
                 throw new Exception($"Expected '{'{'}' after #{id} but instead got {c}");
@@ -306,13 +306,14 @@ namespace Assets.Serialization
             if (hopefullyType != "type")
                 throw new Exception(
                     $"Expected type name at the beginning of complex object id {id} but instead got {typeName}");
-            var type = typeName as string;
+            string type = typeName as string;
             if (type == null)
                 throw new Exception(
                     $"Expected a type name (a string) in 'type: ...' expression for object id {id}, but instead got {typeName}");
 
             // Great!  Now what?
             var obj = Utilities.MakeInstance(type); // new obj without fields
+            idTable[id] = obj; // put object to dictionary
 
             // Read the fields until we run out of them
             while (!End && PeekChar != '}')
@@ -327,8 +328,7 @@ namespace Assets.Serialization
 
             GetChar();  // Swallow close bracket
 
-            // We're done.  Now what?
-            idTable[id] = obj; // put object to dictionary
+            // We're done.  Now what
             return obj; // return object
         }
 

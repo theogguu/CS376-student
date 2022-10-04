@@ -204,7 +204,7 @@ namespace Assets.Serialization
 
                 // Not: don't worry about handling strings that contain quote marks
                 case string s:
-                    Write($"\"{s}\"");
+                    Write($"\"{s}\""); // we want <"poop"> and not <poop> so we need escape sequences
                     break;
 
                 case bool b:
@@ -212,12 +212,8 @@ namespace Assets.Serialization
                     break;
 
                 case IList list:
-                    foreach (object item in list)
-                    {
-                        WriteObject(item);
-                    }
+                    WriteList(list);
                     break;
-
 
                 default:
                     if (o.GetType().IsValueType)
