@@ -27,6 +27,17 @@ public class Player : MonoBehaviour
     public float OrbVelocity = 10;
 
     /// <summary>
+    /// RigidBody2D Player Body
+    /// </summary>
+    public Rigidbody2D Body;
+
+    /// Initialize Body
+    void Start()
+    {
+        Body = GetComponent<Rigidbody2D>();
+    }
+
+    /// <summary>
     /// Handle moving and firing.
     /// Called by Uniity every 1/50th of a second, regardless of the graphics card's frame rate
     /// </summary>
@@ -42,8 +53,21 @@ public class Player : MonoBehaviour
     /// Unlike the Enemies, the player has no cooldown, so they shoot a whole blob of orbs
     /// </summary>
     void MaybeFire()
-    {
-        // TODO
+    {   
+        
+        if (Input.GetAxis("Fire") == 1)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                FireOrb();
+            }
+            
+        }
+        
+        else if (Input.GetAxis("Fire") > 0)
+        {
+            FireOrb();
+        }
     }
 
     /// <summary>
@@ -53,7 +77,16 @@ public class Player : MonoBehaviour
     /// </summary>
     private void FireOrb()
     {
-        // TODO
+        Vector3 Vec = new Vector3(Body.position.x + transform.right.x + 1, Body.position.y + transform.right.y);
+
+
+        var Orb = Instantiate(OrbPrefab, Vec, Quaternion.identity);
+
+        Rigidbody2D OrbBody = Orb.GetComponent<Rigidbody2D>();
+
+        //OrbBody.AddForce(new Vector2(10,10));
+
+        OrbBody.velocity = new Vector2(OrbVelocity*transform.right.x, OrbVelocity*transform.right.y);   
     }
 
     /// <summary>
@@ -64,7 +97,10 @@ public class Player : MonoBehaviour
     /// </summary>
     void Manoeuvre()
     {
-        // TODO
+        Vector2 F = new Vector2(Input.GetAxis("Horizontal")*EnginePower, Input.GetAxis("Vertical")*EnginePower);
+
+        Body.AddForce(F);
+        Body.angularVelocity = Input.GetAxis("Rotate")*RotateSpeed;
     }
 
     /// <summary>
